@@ -312,6 +312,10 @@ function renderActions(): void {
     }
     actions.append(
       button(t('pass'), 'ghost-button', () => client.send({ type: 'pass' })),
+      withTitle(
+        button(t('countNow'), 'ghost-button accent-button', () => client.send({ type: 'requestCount' })),
+        t('countNowHint'),
+      ),
       button(t('resign'), 'ghost-button danger-button', () => {
         if (confirm(t('resignConfirm'))) client.send({ type: 'resign' });
       }),
@@ -336,6 +340,12 @@ function renderActions(): void {
     button(asked ? t('rematchWaiting') : t('rematch'), 'primary-button', () => client.send({ type: 'rematch' })),
   );
   if (asked) (actions.firstElementChild as HTMLButtonElement).disabled = true;
+}
+
+function withTitle(node: HTMLButtonElement, title: string): HTMLButtonElement {
+  node.title = title;
+  node.setAttribute('aria-label', `${node.textContent} — ${title}`);
+  return node;
 }
 
 function button(label: string, className: string, onClick: () => void): HTMLButtonElement {

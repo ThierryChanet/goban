@@ -25,7 +25,11 @@ Regles appliquees par le serveur :
 - **super-ko positionnel** : aucune position deja apparue ne peut etre recreee (couvre
   le ko simple et les triples ko) ;
 - passe, abandon ;
-- deux passes consecutives ouvrent la **phase de comptage** : chacun touche les groupes
+- bouton **Compter les points** : arrete la partie en l'etat et ouvre directement le
+  comptage, sans passer par deux passes. Ce n'est pas un abandon et ce n'est pas
+  unilateral : l'adversaire peut refuser, et la partie repart exactement ou elle en
+  etait ;
+- deux passes consecutives ouvrent aussi la **phase de comptage** : chacun touche les groupes
   morts pour les retirer, et les deux joueurs doivent valider. Un joueur peut refuser et
   reprendre la partie ;
 - **comptage chinois (surface)** : pierres vivantes + intersections entourees par un seul
@@ -126,7 +130,9 @@ sync, and a game survives a page reload or a short network drop.
 
 Options: 9x9 / 13x13 / 19x19, handicap 2-9 stones, free komi, choice of who starts and of
 your own colour. Chinese (area) scoring with a dead-stone marking phase both players must
-accept, positional superko, pass, resign, one-click rematch with colours swapped. The UI
+accept, positional superko, pass, resign, a *count the score* button that jumps
+straight to scoring from any position (declinable, play resumes untouched), and a
+one-click rematch with colours swapped. The UI
 is bilingual (`FR / EN` button) and mobile-first: tap an intersection, then confirm.
 
 ```bash

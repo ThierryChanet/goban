@@ -109,6 +109,45 @@ describe('deroulement de la partie', () => {
     expect(game.phase).toBe('playing');
   });
 
+  it('passe au comptage a la demande, sans deux passes', () => {
+    const game = newGame();
+    game.play('black', at(9, 4, 4));
+    game.play('white', at(9, 2, 2));
+    game.play('black', at(9, 6, 6));
+    expect(game.toMove).toBe('white');
+
+    // N'importe lequel des deux joueurs peut le demander, meme hors de son tour.
+    game.requestCount();
+    expect(game.phase).toBe('marking');
+    expect(game.confirmed).toEqual({ black: false, white: false });
+    expect(game.passes).toBe(0);
+  });
+
+  it('reprend la partie au meme endroit si le comptage demande est refuse', () => {
+    const game = newGame();
+    game.play('black', at(9, 4, 4));
+    game.play('white', at(9, 2, 2));
+    game.play('black', at(9, 6, 6));
+
+    game.requestCount();
+    game.resumePlay();
+    expect(game.phase).toBe('playing');
+    expect(game.toMove).toBe('white'); // le tour de jeu n'a pas bouge
+    expect(game.moveNumber).toBe(3);
+    expect(game.deadStones.size).toBe(0);
+    expect(() => game.play('white', at(9, 2, 6))).not.toThrow();
+  });
+
+  it('ne compte pas deux fois ni hors de la phase de jeu', () => {
+    const game = newGame();
+    game.requestCount();
+    expect(() => game.requestCount()).toThrow(RuleError);
+    game.confirmScore('black');
+    game.confirmScore('white');
+    expect(game.phase).toBe('finished');
+    expect(() => game.requestCount()).toThrow(RuleError);
+  });
+
   it('termine la partie sur un abandon', () => {
     const game = newGame();
     game.resign('white');

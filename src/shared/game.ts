@@ -184,10 +184,25 @@ export class GoGame {
     this.toMove = otherColor(color);
 
     if (this.passes >= 2) {
-      this.phase = 'marking';
-      this.confirmed = { black: false, white: false };
-      this.deadStones = new Set(this.guessDeadStones());
+      this.enterMarking();
     }
+  }
+
+  /**
+   * Arrete la partie en l'etat et passe directement au comptage, sans attendre
+   * deux passes. N'importe lequel des deux joueurs peut le demander, a tout
+   * moment : ce n'est pas un abandon, l'adversaire peut refuser le comptage et
+   * la partie repart exactement ou elle en etait (`resumePlay`).
+   */
+  requestCount(): void {
+    if (this.phase !== 'playing') throw new RuleError('wrong_phase');
+    this.enterMarking();
+  }
+
+  private enterMarking(): void {
+    this.phase = 'marking';
+    this.confirmed = { black: false, white: false };
+    this.deadStones = new Set(this.guessDeadStones());
   }
 
   resign(color: Color): void {

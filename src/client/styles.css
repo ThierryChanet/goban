@@ -244,6 +244,11 @@ select:focus {
   width: 100%;
 }
 
+.accent-button {
+  border-color: rgba(224, 164, 88, 0.65);
+  color: var(--accent-strong);
+}
+
 .danger-button {
   border-color: rgba(215, 107, 91, 0.6);
   color: var(--danger);

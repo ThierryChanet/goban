@@ -23,6 +23,7 @@ export type ClientMessage =
   | { type: 'join'; token: string; name?: string; roomId: string }
   | { type: 'move'; point: number }
   | { type: 'pass' }
+  | { type: 'requestCount' }
   | { type: 'resign' }
   | { type: 'toggleDead'; point: number }
   | { type: 'confirmScore' }
