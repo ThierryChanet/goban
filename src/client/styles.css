@@ -1,0 +1,502 @@
+:root {
+  --bg: #16110d;
+  --bg-elevated: #211a14;
+  --bg-input: #2c231b;
+  --line: #3b2f24;
+  --text: #f3ece2;
+  --text-dim: #b6a794;
+  --accent: #e0a458;
+  --accent-strong: #f0b970;
+  --danger: #d76b5b;
+  --ok: #74b06a;
+  --radius: 14px;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+#app {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-elevated);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+.brand-mark {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fafafa 0 50%, #121212 50% 100%);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-pill {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.status-pill.online {
+  color: var(--ok);
+  border-color: rgba(116, 176, 106, 0.5);
+}
+
+.status-pill.offline {
+  color: var(--danger);
+  border-color: rgba(215, 107, 91, 0.5);
+}
+
+main {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0.7rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* L accueil defile, la vue de jeu tient dans l ecran. */
+#screen-home {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#screen-game {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen.hidden,
+.hidden {
+  display: none !important;
+}
+
+.tagline {
+  margin: 0.2rem 0 1rem;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin: 0 auto 1rem;
+  max-width: 460px;
+}
+
+.card h2 {
+  margin: 0 0 0.9rem;
+  font-size: 1.05rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.9rem;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+.hint {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.7rem 0.75rem;
+  font-size: 1rem;
+  color: var(--text);
+  background: var(--bg-input);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-family: inherit;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+#input-code {
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.segmented {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.segmented button {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 0.55rem 0.6rem;
+  font-size: 0.88rem;
+  color: var(--text);
+  background: var(--bg-input);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.segmented button.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #201509;
+  font-weight: 600;
+}
+
+.primary-button {
+  width: 100%;
+  min-height: 50px;
+  font-size: 1rem;
+  font-weight: 650;
+  color: #201509;
+  background: var(--accent);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  margin-bottom: 0.6rem;
+}
+
+.primary-button:active {
+  background: var(--accent-strong);
+}
+
+.ghost-button {
+  min-height: 40px;
+  padding: 0.45rem 0.8rem;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+
+.ghost-button.wide {
+  width: 100%;
+}
+
+.danger-button {
+  border-color: rgba(215, 107, 91, 0.6);
+  color: var(--danger);
+}
+
+/* --- Partie --- */
+
+.game-layout {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: center;
+  width: 100%;
+}
+
+.board-area {
+  flex: 1 1 auto;
+  min-height: 8rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.board-frame {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.45));
+}
+
+#board {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.panel {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  max-height: 60%;
+}
+
+#phase-help:empty {
+  display: none;
+}
+
+.share-box {
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.8rem;
+}
+
+.share-box h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+}
+
+.code-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.4rem;
+}
+
+.room-code {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+}
+
+.waiting {
+  margin: 0.5rem 0 0;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+.players {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  padding: 0.55rem 0.6rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 0.85rem;
+}
+
+.player.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.player.you .player-name::after {
+  content: ' •';
+  color: var(--accent);
+}
+
+.player-name {
+  font-weight: 600;
+}
+
+.player-meta {
+  width: 100%;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+}
+
+.stone-dot {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  flex: none;
+}
+
+.stone-dot.black {
+  background: #101010;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+.stone-dot.white {
+  background: #f4f2ed;
+}
+
+.turn-banner {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  font-weight: 600;
+  text-align: center;
+}
+
+.turn-banner.active {
+  background: rgba(224, 164, 88, 0.16);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.actions button {
+  flex: 1 1 44%;
+  min-height: 50px;
+  font-size: 0.95rem;
+}
+
+.score-box {
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.8rem;
+  font-size: 0.88rem;
+}
+
+.score-box h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+.score-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.score-table th,
+.score-table td {
+  padding: 0.25rem 0.3rem;
+  text-align: right;
+  border-bottom: 1px solid var(--line);
+}
+
+.score-table th:first-child,
+.score-table td:first-child {
+  text-align: left;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+.score-table tr:last-child td {
+  border-bottom: none;
+  font-weight: 700;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1.2rem + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  max-width: 90vw;
+  padding: 0.7rem 1rem;
+  background: #3a2a1c;
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  font-size: 0.9rem;
+  z-index: 20;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Ecrans courts (telephone en paysage) : on gagne de la place. */
+@media (max-height: 520px) {
+  .players {
+    font-size: 0.78rem;
+  }
+
+  .turn-banner {
+    padding: 0.4rem 0.5rem;
+  }
+
+  .actions button {
+    min-height: 42px;
+  }
+}
+
+@media (min-width: 900px) {
+  .game-layout {
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  .board-area {
+    flex: 1 1 auto;
+  }
+
+  .panel {
+    flex: 0 0 320px;
+    max-width: 320px;
+    max-height: none;
+  }
+}

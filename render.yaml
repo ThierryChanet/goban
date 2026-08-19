@@ -1,0 +1,15 @@
+# Deploiement en un clic sur Render : https://dashboard.render.com/blueprints
+# New > Blueprint > choisir ce depot > Apply. Rien d'autre a configurer.
+services:
+  - type: web
+    name: goban
+    runtime: node
+    plan: free
+    branch: main
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: '22'

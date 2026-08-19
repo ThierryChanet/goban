@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#1b1410" />
+    <meta name="description" content="Jouez au Go a deux, chacun sur son ecran." />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23dcae6a'/%3E%3Ccircle cx='12' cy='12' r='6' fill='%23111'/%3E%3Ccircle cx='20' cy='20' r='6' fill='%23fafafa'/%3E%3C/svg%3E" />
+    <title>Go</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span data-i18n="appTitle">Go</span>
+        </div>
+        <div class="topbar-right">
+          <span id="status-pill" class="status-pill"></span>
+          <button id="lang-toggle" class="ghost-button" type="button">FR / EN</button>
+        </div>
+      </header>
+
+      <main>
+        <!-- Accueil -->
+        <section id="screen-home" class="screen">
+          <p class="tagline" data-i18n="tagline"></p>
+
+          <div class="card">
+            <h2 data-i18n="newGame"></h2>
+
+            <label class="field">
+              <span data-i18n="yourName"></span>
+              <input id="input-name" type="text" maxlength="24" autocomplete="nickname" />
+            </label>
+
+            <div class="field">
+              <span data-i18n="boardSize"></span>
+              <div class="segmented" id="seg-size" role="group">
+                <button type="button" data-value="9" data-i18n="size9"></button>
+                <button type="button" data-value="13" data-i18n="size13"></button>
+                <button type="button" data-value="19" class="selected" data-i18n="size19"></button>
+              </div>
+            </div>
+
+            <label class="field">
+              <span data-i18n="handicap"></span>
+              <select id="select-handicap"></select>
+            </label>
+
+            <label class="field">
+              <span data-i18n="komi"></span>
+              <input id="input-komi" type="number" step="0.5" min="-100" max="100" inputmode="decimal" />
+              <small class="hint" data-i18n="komiHint"></small>
+            </label>
+
+            <div class="field">
+              <span data-i18n="yourColor"></span>
+              <div class="segmented" id="seg-color" role="group">
+                <button type="button" data-value="black" class="selected" data-i18n="black"></button>
+                <button type="button" data-value="white" data-i18n="white"></button>
+                <button type="button" data-value="random" data-i18n="random"></button>
+              </div>
+              <small class="hint" id="first-player-hint"></small>
+            </div>
+
+            <div class="field" id="field-first-player">
+              <span data-i18n="firstPlayer"></span>
+              <div class="segmented" id="seg-first" role="group">
+                <button type="button" data-value="black" class="selected" data-i18n="blackFirst"></button>
+                <button type="button" data-value="white" data-i18n="whiteFirst"></button>
+              </div>
+            </div>
+
+            <button id="btn-create" class="primary-button" type="button" data-i18n="createGame"></button>
+            <small class="hint" data-i18n="rules"></small>
+          </div>
+
+          <div class="card">
+            <h2 data-i18n="joinGame"></h2>
+            <label class="field">
+              <span data-i18n="roomCode"></span>
+              <input
+                id="input-code"
+                type="text"
+                maxlength="8"
+                autocapitalize="characters"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </label>
+            <button id="btn-join" class="primary-button" type="button" data-i18n="join"></button>
+          </div>
+        </section>
+
+        <!-- Partie -->
+        <section id="screen-game" class="screen hidden">
+          <div class="game-layout">
+            <div class="board-area">
+              <div class="board-frame">
+                <canvas id="board" aria-label="Goban"></canvas>
+              </div>
+            </div>
+
+            <aside class="panel">
+              <div id="share-box" class="share-box hidden">
+                <h3 data-i18n="share"></h3>
+                <div class="code-row">
+                  <span id="room-code" class="room-code"></span>
+                  <button id="btn-copy" class="ghost-button" type="button" data-i18n="copyLink"></button>
+                  <button id="btn-share" class="ghost-button hidden" type="button">↗</button>
+                </div>
+                <small class="hint" data-i18n="shareHint"></small>
+                <p id="waiting-note" class="waiting" data-i18n="waitingOpponent"></p>
+              </div>
+
+              <div class="players">
+                <div id="player-black" class="player">
+                  <span class="stone-dot black"></span>
+                  <span class="player-name"></span>
+                  <span class="player-meta"></span>
+                </div>
+                <div id="player-white" class="player">
+                  <span class="stone-dot white"></span>
+                  <span class="player-name"></span>
+                  <span class="player-meta"></span>
+                </div>
+              </div>
+
+              <p id="turn-banner" class="turn-banner"></p>
+              <p id="phase-help" class="hint"></p>
+              <div id="score-box" class="score-box hidden"></div>
+
+              <div id="actions" class="actions"></div>
+              <button id="btn-home" class="ghost-button wide" type="button" data-i18n="backHome"></button>
+            </aside>
+          </div>
+        </section>
+      </main>
+
+      <div id="toast" class="toast hidden"></div>
+    </div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
