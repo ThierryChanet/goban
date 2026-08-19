@@ -244,6 +244,18 @@ select:focus {
   width: 100%;
 }
 
+.subtle-button {
+  color: var(--text-dim);
+}
+
+.wide-button {
+  flex: 1 1 100%;
+}
+
+.actions button:disabled {
+  opacity: 0.4;
+}
+
 .accent-button {
   border-color: rgba(224, 164, 88, 0.65);
   color: var(--accent-strong);

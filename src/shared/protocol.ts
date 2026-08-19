@@ -24,6 +24,7 @@ export type ClientMessage =
   | { type: 'move'; point: number }
   | { type: 'pass' }
   | { type: 'requestCount' }
+  | { type: 'undo' }
   | { type: 'resign' }
   | { type: 'toggleDead'; point: number }
   | { type: 'confirmScore' }
@@ -45,6 +46,7 @@ export type ServerErrorCode =
   | 'out_of_bounds'
   | 'wrong_phase'
   | 'not_a_stone'
+  | 'nothing_to_undo'
   | 'rate_limited'
   | 'server_error';
 

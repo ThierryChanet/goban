@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { GoGame, RuleError, normalizeConfig } from '../src/shared/game.js';
-import { BLACK, decodeBoard, encodeBoard, indexOf } from '../src/shared/goban.js';
+import { BLACK, WHITE, decodeBoard, encodeBoard, indexOf } from '../src/shared/goban.js';
 
 function newGame(size: 9 | 13 | 19 = 9, overrides = {}) {
   return new GoGame(normalizeConfig({ size, handicap: 0, komi: 6.5, firstPlayer: 'black', ...overrides }));
@@ -107,6 +107,88 @@ describe('deroulement de la partie', () => {
     expect(game.passes).toBe(0);
     game.pass('black');
     expect(game.phase).toBe('playing');
+  });
+
+  it('annule le dernier coup et rend la main au bon joueur', () => {
+    const game = newGame();
+    game.play('black', at(9, 4, 4));
+    game.play('white', at(9, 2, 2));
+    expect(game.canUndo).toBe(true);
+
+    game.undo();
+    expect(game.toMove).toBe('white');
+    expect(game.moveNumber).toBe(1);
+    expect(game.board.cells[at(9, 2, 2)]).toBe(0);
+    expect(game.board.cells[at(9, 4, 4)]).toBe(BLACK);
+    expect(game.lastMove).toBe(at(9, 4, 4));
+    expect(() => game.play('white', at(9, 2, 2))).not.toThrow();
+  });
+
+  it('restitue les pierres capturees et le compteur de prisonniers', () => {
+    const game = newGame();
+    game.play('black', at(9, 0, 1));
+    game.play('white', at(9, 0, 0));
+    game.play('black', at(9, 1, 0)); // capture la pierre blanche du coin
+    expect(game.captures.black).toBe(1);
+
+    game.undo();
+    expect(game.captures.black).toBe(0);
+    expect(game.board.cells[at(9, 0, 0)]).toBe(WHITE);
+    expect(game.board.cells[at(9, 1, 0)]).toBe(0);
+    expect(game.toMove).toBe('black');
+  });
+
+  it('libere la position de super-ko apres une annulation', () => {
+    const game = newGame();
+    const p = (x: number, y: number) => at(9, x, y);
+    game.play('black', p(2, 0));
+    game.play('white', p(1, 0));
+    game.play('black', p(3, 1));
+    game.play('white', p(0, 1));
+    game.play('black', p(2, 2));
+    game.play('white', p(1, 2));
+    game.play('black', p(7, 7));
+    game.play('white', p(2, 1));
+    game.play('black', p(1, 1)); // capture dans le ko
+    expect(() => game.play('white', p(2, 1))).toThrow(RuleError);
+
+    game.undo(); // on retire la capture : la position redevient disponible
+    expect(game.toMove).toBe('black');
+    expect(() => game.play('black', p(1, 1))).not.toThrow();
+  });
+
+  it('annule aussi une passe', () => {
+    const game = newGame();
+    game.play('black', at(9, 4, 4));
+    game.pass('white');
+    expect(game.passes).toBe(1);
+    game.undo();
+    expect(game.passes).toBe(0);
+    expect(game.toMove).toBe('white');
+    expect(game.history).toHaveLength(1);
+  });
+
+  it('refuse d annuler quand il n y a rien a annuler', () => {
+    const game = newGame();
+    expect(game.canUndo).toBe(false);
+    expect(() => game.undo()).toThrow(RuleError);
+  });
+
+  it('n annule pas une partie terminee ni les pierres de handicap', () => {
+    const handicapGame = new GoGame(normalizeConfig({ size: 9, handicap: 4 }));
+    expect(handicapGame.canUndo).toBe(false); // les pierres posees ne sont pas des coups
+    handicapGame.play('white', at(9, 4, 4));
+    handicapGame.undo();
+    expect(handicapGame.handicapStones).toHaveLength(4);
+    for (const point of handicapGame.handicapStones) {
+      expect(handicapGame.board.cells[point]).toBe(BLACK);
+    }
+
+    const game = newGame();
+    game.play('black', at(9, 4, 4));
+    game.resign('black');
+    expect(game.canUndo).toBe(false);
+    expect(() => game.undo()).toThrow(RuleError);
   });
 
   it('passe au comptage a la demande, sans deux passes', () => {

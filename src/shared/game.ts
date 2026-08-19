@@ -2,6 +2,7 @@ import {
   cellOf,
   cloneBoard,
   createBoard,
+  decodeBoard,
   encodeBoard,
   groupAt,
   isOnBoard,
@@ -33,13 +34,25 @@ export type RuleErrorCode =
   | 'ko'
   | 'out_of_bounds'
   | 'wrong_phase'
-  | 'not_a_stone';
+  | 'not_a_stone'
+  | 'nothing_to_undo';
 
 export class RuleError extends Error {
   constructor(public readonly code: RuleErrorCode) {
     super(code);
     this.name = 'RuleError';
   }
+}
+
+/** Etat d'avant un coup, conserve pour pouvoir revenir en arriere. */
+interface UndoEntry {
+  board: string;
+  toMove: Color;
+  captures: { black: number; white: number };
+  lastMove: number | null;
+  passes: number;
+  /** Position ajoutee a l'historique de super-ko par ce coup (null pour une passe). */
+  addedPosition: string | null;
 }
 
 export interface MoveRecord {
@@ -60,6 +73,7 @@ export interface GameSnapshot {
   passes: number;
   handicapStones: number[];
   deadStones: number[];
+  canUndo: boolean;
   confirmed: { black: boolean; white: boolean };
   history: MoveRecord[];
   result: string | null;
@@ -123,6 +137,7 @@ export class GoGame {
   score: ScoreDetail | null = null;
 
   private positions = new Set<string>();
+  private undoStack: UndoEntry[] = [];
 
   constructor(config: GameConfig) {
     this.config = config;
@@ -149,6 +164,7 @@ export class GoGame {
 
   play(color: Color, point: number): void {
     const { board, captured } = this.checkMove(color, point);
+    this.pushUndo(encodeBoard(board));
     this.board = board;
     this.captures[color] += captured.length;
     this.lastMove = point;
@@ -177,6 +193,7 @@ export class GoGame {
     if (this.phase !== 'playing') throw new RuleError('wrong_phase');
     if (color !== this.toMove) throw new RuleError('not_your_turn');
 
+    this.pushUndo(null);
     this.passes++;
     this.moveNumber++;
     this.lastMove = null;
@@ -203,6 +220,43 @@ export class GoGame {
     this.phase = 'marking';
     this.confirmed = { black: false, white: false };
     this.deadStones = new Set(this.guessDeadStones());
+  }
+
+  /** Y a-t-il un coup a annuler ? */
+  get canUndo(): boolean {
+    return this.phase === 'playing' && this.undoStack.length > 0;
+  }
+
+  /**
+   * Annule le dernier coup ou la derniere passe, quel qu'en soit l'auteur :
+   * plateau, prisonniers, tour de jeu et historique de super-ko reviennent
+   * exactement dans l'etat d'avant. Les pierres de handicap ne sont jamais
+   * concernees, elles ne font pas partie des coups joues.
+   */
+  undo(): void {
+    if (this.phase !== 'playing') throw new RuleError('wrong_phase');
+    const entry = this.undoStack.pop();
+    if (!entry) throw new RuleError('nothing_to_undo');
+
+    this.board = decodeBoard(entry.board);
+    this.toMove = entry.toMove;
+    this.captures = { ...entry.captures };
+    this.lastMove = entry.lastMove;
+    this.passes = entry.passes;
+    if (entry.addedPosition !== null) this.positions.delete(entry.addedPosition);
+    this.moveNumber = Math.max(0, this.moveNumber - 1);
+    this.history.pop();
+  }
+
+  private pushUndo(addedPosition: string | null): void {
+    this.undoStack.push({
+      board: encodeBoard(this.board),
+      toMove: this.toMove,
+      captures: { ...this.captures },
+      lastMove: this.lastMove,
+      passes: this.passes,
+      addedPosition,
+    });
   }
 
   resign(color: Color): void {
@@ -278,6 +332,7 @@ export class GoGame {
       passes: this.passes,
       handicapStones: [...this.handicapStones],
       deadStones: [...this.deadStones],
+      canUndo: this.canUndo,
       confirmed: { ...this.confirmed },
       history: this.history.slice(-200),
       result: this.result,

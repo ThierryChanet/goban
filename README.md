@@ -24,7 +24,14 @@ Regles appliquees par le serveur :
 - captures par libertes, suicide interdit ;
 - **super-ko positionnel** : aucune position deja apparue ne peut etre recreee (couvre
   le ko simple et les triples ko) ;
-- passe, abandon ;
+- passe ;
+- **annulation du dernier coup** : reprend le dernier coup joue (ou la derniere
+  passe), quel qu'en soit l'auteur — plateau, prisonniers, tour de jeu et historique
+  de ko reviennent exactement dans l'etat d'avant. Les pierres de handicap ne sont
+  jamais concernees ;
+- les actions qui terminent la partie (**Compter les points**, **Abandonner**) sont
+  regroupees derriere un bouton *Fin de partie*, pour ne pas les toucher par megarde
+  en cours de jeu ;
 - bouton **Compter les points** : arrete la partie en l'etat et ouvre directement le
   comptage, sans passer par deux passes. Ce n'est pas un abandon et ce n'est pas
   unilateral : l'adversaire peut refuser, et la partie repart exactement ou elle en
@@ -130,9 +137,11 @@ sync, and a game survives a page reload or a short network drop.
 
 Options: 9x9 / 13x13 / 19x19, handicap 2-9 stones, free komi, choice of who starts and of
 your own colour. Chinese (area) scoring with a dead-stone marking phase both players must
-accept, positional superko, pass, resign, a *count the score* button that jumps
-straight to scoring from any position (declinable, play resumes untouched), and a
-one-click rematch with colours swapped. The UI
+accept, positional superko, pass, undo of the last move (board, captures, turn and
+ko history all restored), a *count the score* button that jumps straight to scoring
+from any position (declinable, play resumes untouched), and a one-click rematch with
+colours swapped. Game-ending actions sit behind an *End the game* button so they are
+never tapped by accident. The UI
 is bilingual (`FR / EN` button) and mobile-first: tap an intersection, then confirm.
 
 ```bash

@@ -45,6 +45,7 @@ let aim: number | null = null;
 let hover: number | null = null;
 let status: NetStatus = 'connecting';
 let previousMoveNumber = -1;
+let endMenuOpen = false;
 let toastTimer: number | undefined;
 
 const canvas = el<HTMLCanvasElement>('board');
@@ -164,7 +165,10 @@ function render(): void {
     }
     previousMoveNumber = game.moveNumber;
     aim = null;
+    endMenuOpen = false;
   }
+
+  if (game.phase !== 'playing') endMenuOpen = false;
 
   renderBoard();
   renderShare();
@@ -310,14 +314,44 @@ function renderActions(): void {
       );
       return;
     }
+
+    // Actions courantes : jouer, passer, revenir en arriere.
+    const undoButton = withTitle(
+      button(t('undoMove'), 'ghost-button', () => client.send({ type: 'undo' })),
+      t('undoHint'),
+    );
+    undoButton.disabled = !game.canUndo;
+    actions.append(button(t('pass'), 'ghost-button', () => client.send({ type: 'pass' })), undoButton);
+
+    // Les actions qui terminent la partie sont regroupees, pour eviter
+    // de les toucher par megarde en cours de jeu.
+    if (!endMenuOpen) {
+      actions.append(
+        button(`${t('endMenu')} ▾`, 'ghost-button subtle-button wide-button', () => {
+          endMenuOpen = true;
+          render();
+        }),
+      );
+      return;
+    }
+
     actions.append(
-      button(t('pass'), 'ghost-button', () => client.send({ type: 'pass' })),
       withTitle(
-        button(t('countNow'), 'ghost-button accent-button', () => client.send({ type: 'requestCount' })),
+        button(t('countNow'), 'ghost-button accent-button', () => {
+          endMenuOpen = false;
+          client.send({ type: 'requestCount' });
+        }),
         t('countNowHint'),
       ),
       button(t('resign'), 'ghost-button danger-button', () => {
-        if (confirm(t('resignConfirm'))) client.send({ type: 'resign' });
+        if (confirm(t('resignConfirm'))) {
+          endMenuOpen = false;
+          client.send({ type: 'resign' });
+        }
+      }),
+      button(`${t('closeMenu')} ▴`, 'ghost-button subtle-button wide-button', () => {
+        endMenuOpen = false;
+        render();
       }),
     );
     return;

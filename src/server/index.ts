@@ -193,6 +193,9 @@ function handleMessage(session: Session, message: ClientMessage): void {
     case 'requestCount':
       room.game.requestCount();
       break;
+    case 'undo':
+      room.game.undo();
+      break;
     case 'resign':
       room.game.resign(seat);
       break;
