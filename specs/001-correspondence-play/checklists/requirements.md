@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain — 2 restants : canal d'alerte (US3/FR-011), délai d'expiration (FR-008)
+- [x] No [NEEDS CLARIFICATION] markers remain (résolus le 2026-10-12 : web push, 30 jours)
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)

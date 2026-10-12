@@ -20,6 +20,13 @@ je joue mon coup, je ferme l'application, mon adversaire joue le sien quand il l
 je reviens plus tard. Ce mode devient le **mode par défaut** à la création d'une partie.
 Le mode actuel reste disponible sous le nom **direct** (les deux joueurs sont présents).
 
+## Clarifications
+
+### Session 2026-10-12
+
+- Q : Par quel canal prévenir le joueur que c'est à lui de jouer ? → R : par une notification du navigateur ou du téléphone (web push), activée par le joueur. Pas d'e-mail.
+- Q : Au bout de combien de temps sans activité une partie en correspondance est-elle supprimée ? → R : au bout de 30 jours.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Jouer un coup, partir, revenir plus tard (Priority: P1)
@@ -85,7 +92,7 @@ partie.
 
 **Acceptance Scenarios**:
 
-1. **Given** un joueur qui a accepté d'être prévenu et qui n'a pas la partie ouverte, **When** l'adversaire joue, passe, propose le comptage ou annule, **Then** le joueur reçoit une alerte [NEEDS CLARIFICATION: par quel canal ? notification du navigateur/téléphone, e-mail, ou aucun canal (la liste de l'US2 suffit) ?].
+1. **Given** un joueur qui a accepté d'être prévenu et qui n'a pas la partie ouverte, **When** l'adversaire joue, passe, propose le comptage ou annule, **Then** le joueur reçoit une notification de son navigateur ou de son téléphone, même si l'application est fermée.
 2. **Given** une alerte reçue, **When** le joueur la touche, **Then** la partie concernée s'ouvre.
 3. **Given** un joueur qui n'a pas accepté d'être prévenu, **When** l'adversaire joue, **Then** il ne reçoit rien, et la partie fonctionne normalement.
 
@@ -132,10 +139,10 @@ exactement comme aujourd'hui.
 - **FR-005**: Quand les deux joueurs sont connectés à une partie en correspondance, le système MUST transmettre chaque coup à l'autre joueur aussi vite qu'en mode direct.
 - **FR-006**: En correspondance, un joueur MUST pouvoir annuler uniquement son propre dernier coup ou sa propre dernière passe, et seulement tant que l'adversaire n'a pas joué depuis. Le mode direct conserve la règle actuelle.
 - **FR-007**: Le système MUST afficher, dans une partie, à qui est le tour et depuis quand le dernier coup a été joué (par exemple « Dernier coup il y a 2 jours »).
-- **FR-008**: Une partie en correspondance MUST être conservée tant qu'elle a eu une activité depuis moins de [NEEDS CLARIFICATION: au bout de combien de temps sans aucune activité une partie en correspondance est-elle supprimée ? 30 jours, 90 jours, jamais ?]. Le mode direct conserve son délai actuel de 6 heures.
+- **FR-008**: Une partie en correspondance MUST être conservée tant qu'elle a eu une activité depuis moins de **30 jours**. Au-delà, elle est supprimée. Une partie terminée reste consultable pendant 30 jours après sa fin. Le mode direct conserve son délai actuel de 6 heures.
 - **FR-009**: Le système MUST afficher sur l'accueil la liste des parties non terminées auxquelles le joueur participe depuis cet appareil. Pour chaque partie, la liste indique l'adversaire, la taille du goban, si c'est à lui de jouer et l'ancienneté du dernier coup. Les parties où c'est à lui de jouer apparaissent en premier.
 - **FR-010**: Chaque joueur MUST disposer d'un **lien personnel** qui lui rend sa place et sa couleur sur n'importe quel appareil. Ce lien est distinct du lien d'invitation et lui est présenté avec l'avertissement qu'il ne doit pas être partagé.
-- **FR-011**: Le système MUST permettre à un joueur d'être prévenu quand c'est à lui de jouer. Le joueur choisit d'activer ou non ces alertes (voir US3 pour le canal). Une alerte MUST mener directement à la partie concernée.
+- **FR-011**: Le système MUST permettre à un joueur d'être prévenu quand c'est à lui de jouer. Ces alertes sont des notifications du navigateur ou du téléphone, que le joueur active lui-même, partie par partie ou une fois pour toutes sur l'appareil. Le système ne les demande jamais sans action du joueur. Une alerte MUST mener directement à la partie concernée. Si l'appareil ne prend pas en charge les notifications, le joueur en est informé, et le jeu reste pleinement utilisable.
 - **FR-012**: Toutes les règles existantes s'appliquent à l'identique en correspondance : captures, suicide interdit, super-ko, passe, comptage chinois, marquage des pierres mortes avec validation des deux joueurs, abandon, comptage demandé, revanche.
 - **FR-013**: La phase de comptage MUST pouvoir se dérouler en plusieurs visites : les marques de pierres mortes sont conservées entre les visites et chaque joueur valide quand il le souhaite.
 - **FR-014**: Une revanche MUST reprendre le mode de la partie d'origine.
@@ -145,7 +152,7 @@ exactement comme aujourd'hui.
 ### Key Entities
 
 - **Partie** : réglages (taille, handicap, komi, qui commence), mode (correspondance ou direct), état de jeu, historique des coups, date de création, date du dernier coup, date de la dernière activité, résultat éventuel.
-- **Place de joueur** : couleur, nom affiché, identité secrète permettant de reprendre la place (base du lien personnel), et préférence d'alerte avec ses coordonnées éventuelles.
+- **Place de joueur** : couleur, nom affiché, identité secrète permettant de reprendre la place (base du lien personnel), et abonnements aux notifications des appareils sur lesquels il les a activées.
 - **Liste des parties d'un appareil** : les parties auxquelles cet appareil a participé, avec la couleur occupée dans chacune.
 
 ## Success Criteria *(mandatory)*
@@ -167,4 +174,5 @@ exactement comme aujourd'hui.
 - **Mode par défaut** : le choix de mode est mémorisé sur l'appareil, mais une première visite propose toujours **Correspondance**.
 - **Volumétrie** : quelques centaines de parties simultanées au plus. Le service reste un service unique, déployable comme aujourd'hui.
 - **Spectateurs** : une troisième personne qui ouvre le lien d'invitation voit la partie sans jouer, comme aujourd'hui.
-- **Hors périmètre** : chat, commentaires sur les coups, SGF, classement, matchmaking.
+- **Notifications** : l'iPhone n'accepte les notifications web que si l'application a été ajoutée à l'écran d'accueil. L'écran d'activation l'explique à l'utilisateur.
+- **Hors périmètre** : alertes par e-mail, chat, commentaires sur les coups, SGF, classement, matchmaking.
