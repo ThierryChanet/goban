@@ -17,7 +17,7 @@ Le serveur l'envoie chiffrée via `web-push`, avec un TTL de 7 jours et une urge
 {
   "roomId": "K7P2Q",
   "title": "Go — à vous de jouer",
-  "body": "Bruno a joué le coup 42 (19x19).",
+  "body": "Blanc a joué le coup 42 (19x19).",
   "url": "/?g=K7P2Q",
   "tag": "go-K7P2Q"
 }

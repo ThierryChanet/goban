@@ -31,11 +31,11 @@ Le mode actuel reste disponible sous le nom **direct** (les deux joueurs sont pr
 
 ### User Story 1 - Jouer un coup, partir, revenir plus tard (Priority: P1)
 
-Alice crée une partie, sans changer le mode, qui est en correspondance par défaut. Elle
-envoie le lien à Bruno et joue son premier coup. Elle ferme son navigateur. Le
-lendemain, Bruno ouvre le lien, voit le goban avec le coup d'Alice, joue le sien et ferme
-à son tour. Deux jours plus tard, Alice rouvre le lien : la partie est intacte, le coup de
-Bruno est affiché et c'est à elle de jouer.
+Le joueur A crée une partie, sans changer le mode, qui est en correspondance par défaut.
+Il envoie le lien au joueur B et joue son premier coup, puis ferme son navigateur. Le
+lendemain, B ouvre le lien, voit le goban avec le coup de A, joue le sien et ferme à son
+tour. Deux jours plus tard, A rouvre le lien : la partie est intacte, le coup de B est
+affiché et c'est à A de jouer.
 
 **Why this priority**: c'est le cœur de la demande. Sans conservation de la partie sur
 plusieurs jours, et malgré les redémarrages du service, aucun autre élément de la
@@ -48,7 +48,7 @@ chacun des deux joueurs et poursuivre la partie.
 **Acceptance Scenarios**:
 
 1. **Given** l'écran de création d'une partie, **When** le joueur crée la partie sans toucher au mode, **Then** la partie est en mode correspondance.
-2. **Given** une partie en correspondance où Alice vient de jouer, **When** Alice ferme l'application, **Then** la partie reste disponible et Bruno peut jouer son coup plus tard, sans qu'Alice soit connectée.
+2. **Given** une partie en correspondance où A vient de jouer, **When** A ferme l'application, **Then** la partie reste disponible et B peut jouer son coup plus tard, sans que A soit connecté.
 3. **Given** une partie en correspondance inactive depuis 7 jours, **When** l'un des joueurs rouvre son lien, **Then** il retrouve exactement le même état : plateau, prisonniers, tour de jeu, historique de ko et réglages.
 4. **Given** une partie en correspondance en cours, **When** le service redémarre, **Then** la partie n'est pas perdue.
 5. **Given** les deux joueurs connectés en même temps à une partie en correspondance, **When** l'un joue, **Then** l'autre voit le coup aussi vite qu'en mode direct.
@@ -57,10 +57,10 @@ chacun des deux joueurs et poursuivre la partie.
 
 ### User Story 2 - Savoir où en sont mes parties (Priority: P2)
 
-Alice a trois parties en correspondance avec trois personnes. En ouvrant l'application,
-elle voit la liste de ses parties en cours. Pour chacune, elle voit l'adversaire, la
-taille du goban, si c'est à elle de jouer et depuis quand le dernier coup a été joué.
-Les parties où c'est à elle de jouer apparaissent en premier. Elle touche une partie pour
+Un joueur a trois parties en correspondance avec trois personnes. En ouvrant l'application,
+il voit la liste de ses parties en cours. Pour chacune, il voit l'adversaire, la
+taille du goban, si c'est à lui de jouer et depuis quand le dernier coup a été joué.
+Les parties où c'est à lui de jouer apparaissent en premier. Il touche une partie pour
 l'ouvrir.
 
 **Why this priority**: dès qu'on joue en différé, il faut pouvoir retrouver ses parties
@@ -120,7 +120,7 @@ exactement comme aujourd'hui.
 
 - **Annulation en différé** : aujourd'hui, l'annulation reprend le dernier coup, quel qu'en soit l'auteur. En correspondance, un joueur pourrait donc effacer le coup que son adversaire a joué pendant son absence. Règle retenue : un joueur ne peut annuler que **son propre** dernier coup, et seulement tant que l'adversaire n'a pas encore joué.
 - **Coup posé mais non confirmé** : si le joueur quitte l'application entre « viser » et « confirmer », rien n'est joué.
-- **Deux appareils pour le même joueur** : si le joueur ouvre la partie sur un autre appareil où il n'a jamais joué, l'application lui demande qui il est : « Noir (Thierry) », « Blanc (Alice) » ou « Juste regarder ». Son choix lui rend sa place sur cet appareil, et ses autres appareils la gardent aussi (voir FR-010).
+- **Deux appareils pour le même joueur** : si le joueur ouvre la partie sur un autre appareil où il n'a jamais joué, l'application lui demande qui il est : « Noir (nom du joueur) », « Blanc (nom du joueur) » ou « Juste regarder ». Son choix lui rend sa place sur cet appareil, et ses autres appareils la gardent aussi (voir FR-010).
 - **Adversaire qui ne rejoint jamais** : la partie reste ouverte, en attente d'un second joueur, jusqu'au délai d'expiration.
 - **Adversaire qui ne joue plus** : aucune perte au temps n'est appliquée (pas de pendule). Le joueur qui attend peut toujours abandonner, ou proposer de compter les points. Une partie sans aucune activité finit par expirer (FR-008).
 - **Phase de comptage en différé** : marquer les pierres mortes puis valider peut se faire en plusieurs visites, et chaque joueur voit les marques de l'autre quand il revient.
