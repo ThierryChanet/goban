@@ -55,26 +55,24 @@ chacun des deux joueurs et poursuivre la partie.
 
 ---
 
-### User Story 2 - Savoir où en sont mes parties (Priority: P2)
+### User Story 2 - Reprendre la partie en cours (Priority: P2)
 
-Un joueur a trois parties en correspondance avec trois personnes. En ouvrant l'application,
-il voit la liste de ses parties en cours. Pour chacune, il voit l'adversaire, la
-taille du goban, si c'est à lui de jouer et depuis quand le dernier coup a été joué.
-Les parties où c'est à lui de jouer apparaissent en premier. Il touche une partie pour
-l'ouvrir.
+En ouvrant l'application, le joueur voit sur l'accueil une carte « Reprendre la partie
+en cours ». Elle indique l'adversaire, la taille du goban, si c'est à lui de jouer et
+depuis quand le dernier coup a été joué. Un toucher ouvre la partie à sa place.
 
-**Why this priority**: dès qu'on joue en différé, il faut pouvoir retrouver ses parties
-sans avoir gardé chaque lien, et voir d'un coup d'œil celles qui attendent un coup.
+**Why this priority**: en différé, on revient souvent par l'accueil plutôt que par le
+lien. Une seule partie à la fois est jouée, donc un seul raccourci suffit.
 
-**Independent Test**: depuis un même appareil, créer ou rejoindre plusieurs parties,
-jouer dans certaines, revenir sur l'accueil et vérifier la liste, l'ordre et l'indication
-« à vous de jouer ».
+**Independent Test**: créer une partie, jouer un coup, revenir à l'accueil, fermer et
+rouvrir l'application ; la carte est là, avec la bonne indication de tour, et l'ouvre.
 
 **Acceptance Scenarios**:
 
-1. **Given** un joueur qui participe à plusieurs parties en correspondance depuis cet appareil, **When** il ouvre l'accueil, **Then** il voit la liste de ses parties non terminées, celles où c'est à lui de jouer en premier.
-2. **Given** la liste des parties, **When** le joueur touche une partie, **Then** elle s'ouvre directement à sa place et dans sa couleur.
-3. **Given** une partie terminée, **When** le joueur ouvre l'accueil, **Then** elle n'apparaît plus parmi les parties en cours, et son résultat reste consultable pendant la durée de conservation.
+1. **Given** un appareil qui a pris place dans une partie en correspondance non terminée, **When** le joueur ouvre l'accueil, **Then** la carte « Reprendre la partie en cours » est affichée, avec l'indication « À vous de jouer » ou « En attente de l'adversaire ».
+2. **Given** la carte, **When** le joueur la touche, **Then** la partie s'ouvre directement à sa place et dans sa couleur.
+3. **Given** la dernière partie de l'appareil est terminée, expirée ou introuvable, **When** le joueur ouvre l'accueil, **Then** la carte n'est pas affichée.
+4. **Given** un joueur qui crée ou rejoint une nouvelle partie, **When** il revient à l'accueil, **Then** la carte pointe vers cette nouvelle partie.
 
 ---
 
@@ -84,7 +82,7 @@ Quand l'adversaire a joué, le joueur absent apprend qu'il est attendu, sans dev
 ouvrir la partie régulièrement pour vérifier.
 
 **Why this priority**: sans signal, une partie par correspondance s'enlise. Cette story
-reste toutefois séparable, car la liste de l'US2 suffit déjà à jouer.
+reste toutefois séparable, car la carte de l'US2 suffit déjà à jouer.
 
 **Independent Test**: un joueur active les alertes. Son adversaire joue pendant qu'il
 n'a pas la partie ouverte. Vérifier qu'il reçoit l'alerte et qu'elle ouvre la bonne
@@ -140,7 +138,7 @@ exactement comme aujourd'hui.
 - **FR-006**: En correspondance, un joueur MUST pouvoir annuler uniquement son propre dernier coup ou sa propre dernière passe, et seulement tant que l'adversaire n'a pas joué depuis. Le mode direct conserve la règle actuelle.
 - **FR-007**: Le système MUST afficher, dans une partie, à qui est le tour et depuis quand le dernier coup a été joué (par exemple « Dernier coup il y a 2 jours »).
 - **FR-008**: Une partie en correspondance MUST être conservée tant qu'elle a eu une activité depuis moins de **30 jours**. Au-delà, elle est supprimée. Une partie terminée reste consultable pendant 30 jours après sa fin. Le mode direct conserve son délai actuel de 6 heures.
-- **FR-009**: Le système MUST afficher sur l'accueil la liste des parties non terminées auxquelles le joueur participe depuis cet appareil. Pour chaque partie, la liste indique l'adversaire, la taille du goban, si c'est à lui de jouer et l'ancienneté du dernier coup. Les parties où c'est à lui de jouer apparaissent en premier.
+- **FR-009**: Le système MUST afficher sur l'accueil une carte « Reprendre la partie en cours » pour la dernière partie non terminée où cet appareil a pris place. La carte indique l'adversaire, la taille du goban, si c'est à lui de jouer et l'ancienneté du dernier coup. Elle n'apparaît pas si cette partie est terminée, expirée ou introuvable.
 - **FR-010**: En correspondance, quand un appareil inconnu ouvre une partie dont les deux places sont prises, le système MUST lui proposer de choisir sa place (Noir ou Blanc, avec le nom de chaque joueur) ou de regarder seulement. Le choix est retenu sur cet appareil, et ne retire pas la place aux appareils déjà reconnus. Ce choix est aussi accessible depuis l'écran de spectateur, en cas d'erreur.
 - **FR-011**: Le système MUST permettre à un joueur d'être prévenu quand c'est à lui de jouer. Ces alertes sont des notifications du navigateur ou du téléphone, que le joueur active lui-même, partie par partie ou une fois pour toutes sur l'appareil. Le système ne les demande jamais sans action du joueur. Une alerte MUST mener directement à la partie concernée. Si l'appareil ne prend pas en charge les notifications, le joueur en est informé, et le jeu reste pleinement utilisable.
 - **FR-012**: Toutes les règles existantes s'appliquent à l'identique en correspondance : captures, suicide interdit, super-ko, passe, comptage chinois, marquage des pierres mortes avec validation des deux joueurs, abandon, comptage demandé, revanche.
@@ -153,7 +151,7 @@ exactement comme aujourd'hui.
 
 - **Partie** : réglages (taille, handicap, komi, qui commence), mode (correspondance ou direct), état de jeu, historique des coups, date de création, date du dernier coup, date de la dernière activité, résultat éventuel.
 - **Place de joueur** : couleur, nom affiché, appareils reconnus sur cette place, et abonnements aux notifications des appareils sur lesquels il les a activées.
-- **Liste des parties d'un appareil** : les parties auxquelles cet appareil a participé, avec la couleur occupée dans chacune.
+- **Partie en cours de l'appareil** : la dernière partie où cet appareil a pris place.
 
 ## Success Criteria *(mandatory)*
 
@@ -161,7 +159,7 @@ exactement comme aujourd'hui.
 
 - **SC-001**: 100 % des parties en correspondance encore actives sont retrouvées intactes après un redémarrage du service.
 - **SC-002**: Une partie en correspondance laissée sans activité pendant 7 jours reprend exactement là où elle en était, pour les deux joueurs.
-- **SC-003**: Depuis l'accueil, un joueur ouvre une partie où c'est à lui de jouer en 2 gestes au plus.
+- **SC-003**: Depuis l'accueil, un joueur ouvre sa partie en cours en 1 geste.
 - **SC-004**: Quand le joueur a activé les alertes, il est prévenu en moins de 5 minutes dans 95 % des cas après le coup de son adversaire.
 - **SC-005**: Un joueur qui ouvre la partie sur un nouvel appareil retrouve sa place en 1 geste (« Je suis Noir / Blanc »), en moins de 10 secondes.
 - **SC-006**: Aucune régression du mode direct : tous les comportements actuels, dont la reconnexion, la revanche et l'annulation, restent identiques.
@@ -176,4 +174,5 @@ exactement comme aujourd'hui.
 - **Volumétrie** : quelques centaines de parties simultanées au plus. Le service reste un service unique, déployable comme aujourd'hui.
 - **Spectateurs** : une troisième personne qui ouvre le lien d'invitation voit la partie sans jouer, comme aujourd'hui.
 - **Notifications** : l'iPhone n'accepte les notifications web que si l'application a été ajoutée à l'écran d'accueil. L'écran d'activation l'explique à l'utilisateur.
+- **Une partie à la fois** : l'accueil ne propose de reprendre que la dernière partie ; une liste de plusieurs parties est hors périmètre. Les autres parties restent accessibles par leur lien.
 - **Hors périmètre** : alertes par e-mail, chat, commentaires sur les coups, SGF, classement, matchmaking.

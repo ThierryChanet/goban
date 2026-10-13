@@ -11,7 +11,7 @@ la mémoire. Aujourd'hui, une partie meurt donc en pratique dès que personne ne
 regarde pendant 15 minutes. Garder les parties en mémoire ou sur le disque local ne
 suffit pas en production.
 
-**Décision** : une interface `RoomRepository` dans `src/server/storage/`, avec deux implémentations :
+**Décision** (Postgres/Neon validé par l'utilisateur, 2026-10-13) : une interface `RoomRepository` dans `src/server/storage/`, avec deux implémentations :
 
 1. **`FileRoomRepository`** (implémentation par défaut). Un fichier JSON par partie dans `DATA_DIR` (par défaut `./data`). L'écriture est atomique : on écrit un fichier temporaire, puis on le renomme. Cette implémentation sert au développement local, aux tests, et à Docker ou Fly.io avec un volume monté.
 2. **`PostgresRoomRepository`**, activée dès que `DATABASE_URL` est défini. Une table `rooms (id text primary key, data jsonb, updated_at timestamptz)` et une table `settings (key text primary key, value text)`. Elle sert à la production sur Render gratuit, avec une base Postgres gratuite externe : Neon, sans expiration. La base Postgres gratuite de Render expire au bout de 30 jours et ne convient donc pas.
@@ -108,17 +108,19 @@ qu'entre les deux joueurs.
 - Lien personnel secret par place : plus sûr, mais un concept de plus à expliquer, pour un usage à deux joueurs qui se font confiance.
 - Remplacer le jeton de la place par celui du nouvel appareil : l'ancien appareil perdrait sa place, ce qui serait déroutant.
 
-## R6. Liste « Mes parties »
+## R6. « Reprendre la partie en cours »
 
-**Décision** : le client garde dans `localStorage` (`go:games`) la liste des codes de
-parties où il a pris place. Sur l'accueil, il envoie `listGames` avec cette liste et
-son jeton. Le serveur répond avec un résumé pour chaque partie **où ce jeton est
-assis**. Les parties inconnues ou expirées sont signalées, et le client les retire de
-sa liste. Le tri est fait par le serveur : « à vous de jouer » d'abord, puis par
-ancienneté du dernier coup, du plus récent au plus ancien.
+**Décision** (choix de l'utilisateur, 2026-10-13) : une seule partie à la fois. Le client
+garde dans `localStorage` (`go:current`) le code de la dernière partie où il a pris
+place (à la création, à l'arrivée sur une place libre, ou après « Qui êtes-vous ? »). Sur
+l'accueil, il envoie `peekGame { token, roomId }`. Le serveur répond `peek` avec un
+résumé si ce jeton est assis dans cette partie et qu'elle n'est pas terminée, sinon
+`null`, et le client efface alors `go:current`.
 
-**Justification** : il n'y a pas de compte, donc pas d'index serveur par joueur à
-maintenir. Sur un nouvel appareil, la liste se remplit au fil des parties ouvertes (R5).
+**Justification** : il n'y a ni compte ni index par joueur à maintenir, et un seul
+raccourci suffit pour un usage à deux.
+
+**Alternative écartée** : la liste « Mes parties » à plusieurs entrées, jugée superflue.
 
 ## R7. Annulation en correspondance
 

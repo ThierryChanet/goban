@@ -90,7 +90,7 @@ d'actions ultérieure (coups, ko, annulation, passes, comptage).
 
 Seules les salles `mode === 'correspondence'` sont stockées.
 
-## GameSummary (ligne de « Mes parties »)
+## GameSummary (carte « Reprendre la partie en cours »)
 
 | Champ | Type |
 | --- | --- |
@@ -105,16 +105,16 @@ Seules les salles `mode === 'correspondence'` sont stockées.
 | `lastMoveAt` | `number \| null` |
 | `result` | `string \| null` |
 
-Tri : `yourTurn` d'abord, puis `lastMoveAt` (ou `createdAt`) du plus récent au plus ancien.
+Le serveur ne renvoie un résumé que si le jeton est assis dans la partie et que `phase !== 'finished'`.
 
 ## État côté appareil (localStorage)
 
 | Clé | Contenu |
 | --- | --- |
 | `go:token` | jeton d'appareil (existant) |
-| `go:games` | `string[]`, codes des parties où l'appareil a pris place (≤ 50, les plus récents) |
+| `go:current` | `string`, code de la dernière partie où l'appareil a pris place |
 | `go:mode` | dernier mode choisi à la création |
-| `go:push` | `'on' \| 'off'`, alertes activées « pour toutes mes parties » sur cet appareil |
+| `go:push` | `'on' \| 'off'`, alertes activées sur cet appareil (renvoyées automatiquement à chaque partie ouverte) |
 
 ## Transitions ajoutées
 

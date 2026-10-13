@@ -14,7 +14,7 @@ en veille et aux redémarrages.
 
 La sauvegarde reproduit **exactement** l'état du moteur (`GoGame.toRecord/fromRecord`),
 pile d'annulation et super-ko compris. Sur un nouvel appareil, le joueur
-indique simplement s'il est Noir ou Blanc. L'accueil liste « Mes parties ». Des **notifications Web Push**
+indique simplement s'il est Noir ou Blanc. L'accueil propose « Reprendre la partie en cours ». Des **notifications Web Push**
 (VAPID, service worker, manifeste) préviennent le joueur absent quand c'est à lui.
 
 En correspondance, l'annulation est limitée à son propre dernier coup.
@@ -52,7 +52,7 @@ fait du README, en guise de garde-fous :
 
 | Principe implicite (README) | Respect par ce plan |
 | --- | --- |
-| Le serveur fait autorité, le client n'envoie que des intentions | ✅ annulation restreinte, choix de place, `listGames` : tout est vérifié côté serveur |
+| Le serveur fait autorité, le client n'envoie que des intentions | ✅ annulation restreinte, choix de place, `peekGame` : tout est vérifié côté serveur |
 | Règles partagées mot pour mot entre client et serveur (`src/shared`) | ✅ la sérialisation `GoGame` vit dans `src/shared/game.ts` ; les types du protocole dans `protocol.ts` |
 | Identité sans compte (jeton dans le navigateur) | ✅ conservée ; une place accepte plusieurs jetons d'appareil |
 | Instantané complet à chaque mise à jour | ✅ inchangé ; l'instantané gagne 3 champs |
@@ -86,7 +86,7 @@ specs/001-correspondence-play/
 src/
   shared/
     game.ts          # + toRecord() / static fromRecord() (GameRecord)
-    protocol.ts      # + GameMode, GameSummary, listGames/games, push*, claimSeat, nouveaux codes d'erreur
+    protocol.ts      # + GameMode, GameSummary, peekGame/peek, push*, claimSeat, nouveaux codes d'erreur
   server/
     rooms.ts         # Room : mode, dates, tokens[], push[] ; toRecord/fromRecord ;
                      #   undo restreint ; résumés ; expiration 30 j ; RoomStore branché sur le repository
@@ -102,15 +102,15 @@ src/
       sw.js                  # service worker (push, notificationclick)
       manifest.webmanifest
       icon-192.png, icon-512.png
-    main.ts          # sélecteur de mode, Mes parties, « Qui êtes-vous ? », activation des alertes, « il y a … »
-    net.ts           # claimSeat, listGames, push(un)subscribe, gestion de `games`
+    main.ts          # sélecteur de mode, carte « Reprendre », « Qui êtes-vous ? », activation des alertes, « il y a … »
+    net.ts           # claimSeat, peekGame, push(un)subscribe, gestion de `peek`
     push.ts          # enregistrement du service worker, abonnement, détection iOS
     i18n.ts          # nouveaux textes FR / EN
-    index.html       # carte « Mes parties », sélecteur de mode, lien du manifeste
+    index.html       # carte « Reprendre la partie en cours », sélecteur de mode, lien du manifeste
     styles.css
 tests/
   persistence.test.ts   # GoGame.toRecord/fromRecord, FileRoomRepository
-  rooms.test.ts         # + mode par défaut, claimSeat, undo restreint, listGames, expiration
+  rooms.test.ts         # + mode par défaut, claimSeat, undo restreint, peekGame, expiration
   push.test.ts          # regroupement, destinataire, purge (web-push simulé)
 ```
 
@@ -124,7 +124,7 @@ interface, et le push dans `src/server/push.ts` et `src/client/push.ts`. Vite ga
 1. **Fondations (US1)** : sérialisation `GoGame` et ses tests, `RoomRepository` (mémoire et fichier), `Room` avec mode, dates et `tokens[]`, chargement et écriture, expiration 30 j, `mode` dans `create`, sélecteur de mode côté client, affichage du mode et de « Dernier coup il y a … ». **C'est le MVP livrable seul.**
 2. **Annulation restreinte (US1)** : règle de salle, erreur et bouton désactivé.
 3. **Nouvel appareil (FR-010)** : `claimSeat`, écran « Qui êtes-vous ? », bouton « Je suis un joueur ».
-4. **Mes parties (US2)** : `go:games`, `listGames` / `games`, carte d'accueil.
+4. **Reprendre la partie (US2)** : `go:current`, `peekGame` / `peek`, carte d'accueil.
 5. **Postgres (prod)** : `PostgresRoomRepository`, `render.yaml`, README.
 6. **Notifications (US3)** : manifeste et icônes, service worker, `/api/push-key`, `push.ts` serveur et client, écran d'activation et cas iOS.
 7. **Finitions** : textes FR/EN, message « partie introuvable ou expirée », `/health`, README, non-régression du mode Direct.

@@ -17,7 +17,7 @@ Les nouvelles suites doivent couvrir :
 
 - `GoGame.toRecord` / `fromRecord`, avec un instantané identique et le même comportement ensuite (ko, annulation, passe → comptage → reprise) ;
 - `FileRoomRepository`, avec une écriture atomique, une relecture et une suppression ;
-- les règles de salle : mode par défaut, `claimSeat` multi-appareils, annulation restreinte, `listGames`, expiration à 30 jours ;
+- les règles de salle : mode par défaut, `claimSeat` multi-appareils, annulation restreinte, `peekGame`, expiration à 30 jours ;
 - le regroupement des notifications : une seule par fenêtre de 30 s, pas d'envoi si l'adversaire est connecté, purge sur 410.
 
 ## 2. Partie en différé et redémarrage (US1, SC-001, SC-002)
@@ -41,11 +41,12 @@ En correspondance, B ne peut pas annuler le coup de A : le bouton est désactiv�
 le serveur répond `undo_not_allowed` si on force l'envoi. A peut annuler son propre
 coup tant que B n'a pas joué. Une partie en mode **Direct** garde l'ancien comportement.
 
-## 4. Mes parties (US2, SC-003)
+## 4. Reprendre la partie en cours (US2, SC-003)
 
-Créer 3 parties depuis A, jouer dans deux d'entre elles depuis B, puis revenir à
-l'accueil de A. La liste affiche les 3 parties, avec « À vous de jouer » en tête. Un
-toucher ouvre la partie à sa place.
+Depuis A, revenir à l'accueil après avoir joué : la carte « Reprendre la partie en
+cours » affiche « En attente de l'adversaire ». B joue, puis A recharge l'accueil : la
+carte affiche « À vous de jouer », et un toucher ouvre la partie. Une fois la partie
+terminée, la carte disparaît.
 
 ## 5. Nouvel appareil (FR-010, SC-005)
 
