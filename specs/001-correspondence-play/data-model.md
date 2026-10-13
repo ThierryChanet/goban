@@ -20,14 +20,13 @@ messages sont dans [contracts/](./contracts/).
 En mode `live`, la règle actuelle s'applique : 6 h sans connexion, sans persistance.
 
 **Revanche** : la même `Room` (même `id`, même `mode`) repart avec un nouveau `GoGame` et
-des couleurs échangées. Les `tokens`, `seatKey` et `push` suivent le joueur. Après la revanche, `finishedAt` repasse à `null` et `lastMoveAt` à `null`.
+des couleurs échangées. Les `tokens` et `push` suivent le joueur. Après la revanche, `finishedAt` repasse à `null` et `lastMoveAt` à `null`.
 
 ## Seat (place de joueur)
 
 | Champ | Type | Règles |
 | --- | --- | --- |
 | `tokens` | `string[]` | jetons d'appareil autorisés sur cette place (≥ 1 une fois la place prise, au plus 8, les plus anciens évincés) |
-| `seatKey` | `string \| null` | secret 128 bits base64url, créé quand la place est prise ; base du lien personnel (FR-010) ; jamais diffusé dans l'instantané |
 | `name` | `string` | ≤ 24 caractères, nettoyé (inchangé) |
 | `rematch` | `boolean` | inchangé |
 | `push` | `PushTarget[]` | abonnements aux notifications pour cette place (≤ 5, dédupliqués par `endpoint`) |

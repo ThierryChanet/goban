@@ -44,7 +44,8 @@ export interface PushSubscriptionPayload {
 | Message | Changement | Règles |
 | --- | --- | --- |
 | `{ type: 'create', …, mode?: GameMode }` | champ `mode` ajouté | absent ou invalide → `'correspondence'` |
-| `{ type: 'join', token, name?, roomId, seatKey?: string }` | champ `seatKey` ajouté | si `seatKey` correspond à une place, le jeton est ajouté à cette place (R5) ; une clé invalide est ignorée sans erreur, et le joueur arrive en spectateur ou sur une place libre comme aujourd'hui |
+| `{ type: 'join', token, name?, roomId }` | inchangé | un appareil inconnu arrive sur une place libre, ou en spectateur, comme aujourd'hui |
+| `{ type: 'claimSeat', color: Color }` | **nouveau** | correspondance seulement (sinon `wrong_mode`) ; demande d'être dans la salle ; ajoute le jeton de la connexion à la place `color` et y déplace la connexion (R5) ; si le jeton occupait l'autre place, il en est retiré ; idempotent |
 | `{ type: 'undo' }` | règle durcie en correspondance | erreur `undo_not_allowed` si le dernier coup n'est pas le sien |
 | `{ type: 'listGames', token: string, roomIds: string[] }` | **nouveau** | au plus 50 codes ; le serveur répond `games` ; ne demande pas d'être dans une salle |
 | `{ type: 'pushSubscribe', subscription: PushSubscriptionPayload, lang: 'fr' \| 'en' }` | **nouveau** | demande d'occuper une place dans la salle courante, sinon `not_seated` ; refusé en mode `live` (`wrong_mode`) ; idempotent par `endpoint` |
@@ -54,7 +55,7 @@ export interface PushSubscriptionPayload {
 
 | Message | Changement |
 | --- | --- |
-| `{ type: 'joined', roomId, seat, snapshot, seatKey?: string }` | `seatKey` n'est présent que pour un joueur assis, et seulement dans ce message adressé à la connexion concernée (jamais dans `state` ni à un tiers) |
+| `{ type: 'joined', roomId, seat, snapshot }` | inchangé |
 | `{ type: 'state', seat, snapshot }` | inchangé (l'instantané gagne `mode`, `createdAt`, `lastMoveAt`) |
 | `{ type: 'games', games: GameSummary[], missing: string[] }` | **nouveau** : `missing` liste les codes inconnus, expirés, ou où ce jeton n'a pas de place ; le client les retire de `go:games` |
 | `{ type: 'error', code }` | nouveaux codes : `undo_not_allowed`, `wrong_mode`, `push_unavailable` |
@@ -62,8 +63,8 @@ export interface PushSubscriptionPayload {
 ## Comportements à couvrir par les tests
 
 1. `create` sans `mode` → `snapshot.mode === 'correspondence'`.
-2. `join` avec la `seatKey` de Noir depuis un nouveau jeton → `seat === 'black'`, et l'ancien jeton reste aussi valide.
-3. La `seatKey` n'apparaît dans aucun message `state`, ni dans aucun message envoyé à l'adversaire ou à un spectateur.
+2. Correspondance, deux places prises : un nouveau jeton arrive en spectateur, puis `claimSeat black` → `seat === 'black'`, et l'ancien jeton de Noir reste aussi valide.
+3. Direct : `claimSeat` → `wrong_mode`.
 4. Correspondance : Blanc tente d'annuler le coup de Noir → `undo_not_allowed`, état inchangé.
 5. Direct : la règle actuelle d'annulation reste inchangée.
 6. `listGames` ne renvoie que les parties où le jeton est assis, triées « à vous de jouer » d'abord.

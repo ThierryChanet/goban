@@ -120,7 +120,7 @@ exactement comme aujourd'hui.
 
 - **Annulation en différé** : aujourd'hui, l'annulation reprend le dernier coup, quel qu'en soit l'auteur. En correspondance, un joueur pourrait donc effacer le coup que son adversaire a joué pendant son absence. Règle retenue : un joueur ne peut annuler que **son propre** dernier coup, et seulement tant que l'adversaire n'a pas encore joué.
 - **Coup posé mais non confirmé** : si le joueur quitte l'application entre « viser » et « confirmer », rien n'est joué.
-- **Deux appareils pour le même joueur** : si le joueur ouvre la partie sur un autre appareil où il n'a jamais joué, il arrive en spectateur. Il doit pouvoir récupérer sa place grâce à un lien personnel, distinct du lien d'invitation (voir FR-010).
+- **Deux appareils pour le même joueur** : si le joueur ouvre la partie sur un autre appareil où il n'a jamais joué, l'application lui demande qui il est : « Noir (Thierry) », « Blanc (Alice) » ou « Juste regarder ». Son choix lui rend sa place sur cet appareil, et ses autres appareils la gardent aussi (voir FR-010).
 - **Adversaire qui ne rejoint jamais** : la partie reste ouverte, en attente d'un second joueur, jusqu'au délai d'expiration.
 - **Adversaire qui ne joue plus** : aucune perte au temps n'est appliquée (pas de pendule). Le joueur qui attend peut toujours abandonner, ou proposer de compter les points. Une partie sans aucune activité finit par expirer (FR-008).
 - **Phase de comptage en différé** : marquer les pierres mortes puis valider peut se faire en plusieurs visites, et chaque joueur voit les marques de l'autre quand il revient.
@@ -141,7 +141,7 @@ exactement comme aujourd'hui.
 - **FR-007**: Le système MUST afficher, dans une partie, à qui est le tour et depuis quand le dernier coup a été joué (par exemple « Dernier coup il y a 2 jours »).
 - **FR-008**: Une partie en correspondance MUST être conservée tant qu'elle a eu une activité depuis moins de **30 jours**. Au-delà, elle est supprimée. Une partie terminée reste consultable pendant 30 jours après sa fin. Le mode direct conserve son délai actuel de 6 heures.
 - **FR-009**: Le système MUST afficher sur l'accueil la liste des parties non terminées auxquelles le joueur participe depuis cet appareil. Pour chaque partie, la liste indique l'adversaire, la taille du goban, si c'est à lui de jouer et l'ancienneté du dernier coup. Les parties où c'est à lui de jouer apparaissent en premier.
-- **FR-010**: Chaque joueur MUST disposer d'un **lien personnel** qui lui rend sa place et sa couleur sur n'importe quel appareil. Ce lien est distinct du lien d'invitation et lui est présenté avec l'avertissement qu'il ne doit pas être partagé.
+- **FR-010**: En correspondance, quand un appareil inconnu ouvre une partie dont les deux places sont prises, le système MUST lui proposer de choisir sa place (Noir ou Blanc, avec le nom de chaque joueur) ou de regarder seulement. Le choix est retenu sur cet appareil, et ne retire pas la place aux appareils déjà reconnus. Ce choix est aussi accessible depuis l'écran de spectateur, en cas d'erreur.
 - **FR-011**: Le système MUST permettre à un joueur d'être prévenu quand c'est à lui de jouer. Ces alertes sont des notifications du navigateur ou du téléphone, que le joueur active lui-même, partie par partie ou une fois pour toutes sur l'appareil. Le système ne les demande jamais sans action du joueur. Une alerte MUST mener directement à la partie concernée. Si l'appareil ne prend pas en charge les notifications, le joueur en est informé, et le jeu reste pleinement utilisable.
 - **FR-012**: Toutes les règles existantes s'appliquent à l'identique en correspondance : captures, suicide interdit, super-ko, passe, comptage chinois, marquage des pierres mortes avec validation des deux joueurs, abandon, comptage demandé, revanche.
 - **FR-013**: La phase de comptage MUST pouvoir se dérouler en plusieurs visites : les marques de pierres mortes sont conservées entre les visites et chaque joueur valide quand il le souhaite.
@@ -152,7 +152,7 @@ exactement comme aujourd'hui.
 ### Key Entities
 
 - **Partie** : réglages (taille, handicap, komi, qui commence), mode (correspondance ou direct), état de jeu, historique des coups, date de création, date du dernier coup, date de la dernière activité, résultat éventuel.
-- **Place de joueur** : couleur, nom affiché, identité secrète permettant de reprendre la place (base du lien personnel), et abonnements aux notifications des appareils sur lesquels il les a activées.
+- **Place de joueur** : couleur, nom affiché, appareils reconnus sur cette place, et abonnements aux notifications des appareils sur lesquels il les a activées.
 - **Liste des parties d'un appareil** : les parties auxquelles cet appareil a participé, avec la couleur occupée dans chacune.
 
 ## Success Criteria *(mandatory)*
@@ -163,12 +163,13 @@ exactement comme aujourd'hui.
 - **SC-002**: Une partie en correspondance laissée sans activité pendant 7 jours reprend exactement là où elle en était, pour les deux joueurs.
 - **SC-003**: Depuis l'accueil, un joueur ouvre une partie où c'est à lui de jouer en 2 gestes au plus.
 - **SC-004**: Quand le joueur a activé les alertes, il est prévenu en moins de 5 minutes dans 95 % des cas après le coup de son adversaire.
-- **SC-005**: Un joueur qui change d'appareil retrouve sa place grâce à son lien personnel en moins de 30 secondes.
+- **SC-005**: Un joueur qui ouvre la partie sur un nouvel appareil retrouve sa place en 1 geste (« Je suis Noir / Blanc »), en moins de 10 secondes.
 - **SC-006**: Aucune régression du mode direct : tous les comportements actuels, dont la reconnexion, la revanche et l'annulation, restent identiques.
 
 ## Assumptions
 
-- **Pas de comptes utilisateurs** : l'identité reste un secret stocké sur l'appareil, complété par le lien personnel (FR-010) pour changer d'appareil. Créer des comptes est hors périmètre.
+- **Pas de comptes utilisateurs** : l'identité reste un secret stocké sur l'appareil. Pour changer d'appareil, le joueur dit simplement quelle couleur il est (FR-010). Créer des comptes est hors périmètre.
+- **Confiance entre joueurs** : le lien d'une partie n'est partagé qu'entre les deux joueurs, qui se connaissent. Quiconque a le lien peut donc se déclarer Noir ou Blanc ; ce risque est accepté, en échange de la simplicité.
 - **Pas de pendule** : il n'y a ni temps par coup ni perte au temps, conformément au périmètre actuel (« pendules » exclues). Un délai par coup pourra faire l'objet d'une fonctionnalité séparée.
 - **Annulation** : en correspondance, elle est restreinte à son propre dernier coup tant que l'adversaire n'a pas joué (voir Edge Cases). C'est le choix le plus sûr quand l'autre joueur est absent.
 - **Mode par défaut** : le choix de mode est mémorisé sur l'appareil, mais une première visite propose toujours **Correspondance**.

@@ -87,22 +87,26 @@ signature VAPID. C'est faisable avec `node:crypto`, mais long et facile à rater
 qu'au moment où l'adversaire joue. Le service est donc réveillé à ce moment-là, et
 l'endormissement ne pose pas de problème.
 
-## R5. Lien personnel et changement d'appareil
+## R5. Changement d'appareil
 
-**Constat** : le jeton actuel (`go:token`) est **unique par appareil** et sert pour
-toutes les parties de cet appareil. Le mettre dans un lien exposerait toutes les
-parties du joueur.
+**Constat** : le jeton actuel (`go:token`) est **unique par appareil**. Un nouvel appareil
+n'a donc aucune place dans la partie, et arrive en spectateur.
 
-**Décision** : chaque place reçoit une **clé de place** (`seatKey`), un secret aléatoire de
-128 bits encodé en base64url, créé quand la place est prise. Le lien personnel est
-`/?g={roomId}&k={seatKey}`. Un `join` qui porte une `seatKey` valide **ajoute** le jeton
-de l'appareil à la liste des jetons de cette place. Une place peut donc avoir plusieurs
-appareils, et chacun garde son propre jeton. Le client retire `k` de l'URL dès la
-connexion (`history.replaceState`). La clé n'est jamais envoyée aux autres connexions :
-elle ne fait pas partie de l'instantané partagé.
+**Décision** (choix de l'utilisateur, 2026-10-13) : pas de lien secret. Les parties se
+jouent à deux, entre personnes qui se connaissent. Quand un appareil sans place ouvre
+une partie en correspondance dont les deux places sont prises, le client affiche
+« Qui êtes-vous ? Noir (nom) / Blanc (nom) / Juste regarder ». Le choix envoie
+`claimSeat { color }`, et le serveur **ajoute** le jeton de l'appareil à la liste des
+jetons de cette place. Une place peut donc avoir plusieurs appareils, et chacun garde le
+sien. Un bouton « Je suis un joueur » reste disponible sur l'écran de spectateur.
 
-**Alternative écartée** : remplacer le jeton de la place par celui du nouvel appareil.
-L'ancien appareil perdrait alors sa place, ce qui serait déroutant.
+**Risque accepté** : quiconque a le lien peut se déclarer joueur. Le lien n'est partagé
+qu'entre les deux joueurs.
+
+**Alternatives écartées** :
+
+- Lien personnel secret par place : plus sûr, mais un concept de plus à expliquer, pour un usage à deux joueurs qui se font confiance.
+- Remplacer le jeton de la place par celui du nouvel appareil : l'ancien appareil perdrait sa place, ce qui serait déroutant.
 
 ## R6. Liste « Mes parties »
 
@@ -114,7 +118,7 @@ sa liste. Le tri est fait par le serveur : « à vous de jouer » d'abord, puis 
 ancienneté du dernier coup, du plus récent au plus ancien.
 
 **Justification** : il n'y a pas de compte, donc pas d'index serveur par joueur à
-maintenir. Le lien personnel (R5) alimente la liste sur un nouvel appareil.
+maintenir. Sur un nouvel appareil, la liste se remplit au fil des parties ouvertes (R5).
 
 ## R7. Annulation en correspondance
 

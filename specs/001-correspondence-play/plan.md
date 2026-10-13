@@ -13,8 +13,8 @@ en production via `DATABASE_URL`. La partie survit ainsi aux déconnexions, aux 
 en veille et aux redémarrages.
 
 La sauvegarde reproduit **exactement** l'état du moteur (`GoGame.toRecord/fromRecord`),
-pile d'annulation et super-ko compris. Chaque joueur reçoit une **clé de place** pour
-changer d'appareil. L'accueil liste « Mes parties ». Des **notifications Web Push**
+pile d'annulation et super-ko compris. Sur un nouvel appareil, le joueur
+indique simplement s'il est Noir ou Blanc. L'accueil liste « Mes parties ». Des **notifications Web Push**
 (VAPID, service worker, manifeste) préviennent le joueur absent quand c'est à lui.
 
 En correspondance, l'annulation est limitée à son propre dernier coup.
@@ -52,10 +52,10 @@ fait du README, en guise de garde-fous :
 
 | Principe implicite (README) | Respect par ce plan |
 | --- | --- |
-| Le serveur fait autorité, le client n'envoie que des intentions | ✅ annulation restreinte, clé de place, `listGames` : tout est vérifié côté serveur |
+| Le serveur fait autorité, le client n'envoie que des intentions | ✅ annulation restreinte, choix de place, `listGames` : tout est vérifié côté serveur |
 | Règles partagées mot pour mot entre client et serveur (`src/shared`) | ✅ la sérialisation `GoGame` vit dans `src/shared/game.ts` ; les types du protocole dans `protocol.ts` |
-| Identité sans compte (jeton dans le navigateur) | ✅ conservée ; la clé de place est un secret par place, pas un compte |
-| Instantané complet à chaque mise à jour | ✅ inchangé ; l'instantané gagne 3 champs et ne contient jamais `seatKey` |
+| Identité sans compte (jeton dans le navigateur) | ✅ conservée ; une place accepte plusieurs jetons d'appareil |
+| Instantané complet à chaque mise à jour | ✅ inchangé ; l'instantané gagne 3 champs |
 | Un seul service, déployable en un clic | ⚠️ une base externe est nécessaire pour la persistance sur Render gratuit (voir Complexity Tracking) ; sans elle, le service démarre quand même |
 | Tests de règles complets | ✅ un test d'aller-retour exact de sérialisation et de nouveaux tests de salles |
 
@@ -86,9 +86,9 @@ specs/001-correspondence-play/
 src/
   shared/
     game.ts          # + toRecord() / static fromRecord() (GameRecord)
-    protocol.ts      # + GameMode, GameSummary, listGames/games, push*, seatKey, nouveaux codes d'erreur
+    protocol.ts      # + GameMode, GameSummary, listGames/games, push*, claimSeat, nouveaux codes d'erreur
   server/
-    rooms.ts         # Room : mode, dates, tokens[], seatKey, push[] ; toRecord/fromRecord ;
+    rooms.ts         # Room : mode, dates, tokens[], push[] ; toRecord/fromRecord ;
                      #   undo restreint ; résumés ; expiration 30 j ; RoomStore branché sur le repository
     storage/
       repository.ts  # interface RoomRepository (+ settings clé/valeur) et fabrique selon l'environnement
@@ -102,15 +102,15 @@ src/
       sw.js                  # service worker (push, notificationclick)
       manifest.webmanifest
       icon-192.png, icon-512.png
-    main.ts          # sélecteur de mode, Mes parties, lien personnel, activation des alertes, « il y a … »
-    net.ts           # seatKey dans join, listGames, push(un)subscribe, gestion de `games`
+    main.ts          # sélecteur de mode, Mes parties, « Qui êtes-vous ? », activation des alertes, « il y a … »
+    net.ts           # claimSeat, listGames, push(un)subscribe, gestion de `games`
     push.ts          # enregistrement du service worker, abonnement, détection iOS
     i18n.ts          # nouveaux textes FR / EN
     index.html       # carte « Mes parties », sélecteur de mode, lien du manifeste
     styles.css
 tests/
   persistence.test.ts   # GoGame.toRecord/fromRecord, FileRoomRepository
-  rooms.test.ts         # + mode par défaut, seatKey, undo restreint, listGames, expiration
+  rooms.test.ts         # + mode par défaut, claimSeat, undo restreint, listGames, expiration
   push.test.ts          # regroupement, destinataire, purge (web-push simulé)
 ```
 
@@ -123,7 +123,7 @@ interface, et le push dans `src/server/push.ts` et `src/client/push.ts`. Vite ga
 
 1. **Fondations (US1)** : sérialisation `GoGame` et ses tests, `RoomRepository` (mémoire et fichier), `Room` avec mode, dates et `tokens[]`, chargement et écriture, expiration 30 j, `mode` dans `create`, sélecteur de mode côté client, affichage du mode et de « Dernier coup il y a … ». **C'est le MVP livrable seul.**
 2. **Annulation restreinte (US1)** : règle de salle, erreur et bouton désactivé.
-3. **Lien personnel (FR-010)** : `seatKey`, `join` avec clé, bouton « Mon lien personnel ».
+3. **Nouvel appareil (FR-010)** : `claimSeat`, écran « Qui êtes-vous ? », bouton « Je suis un joueur ».
 4. **Mes parties (US2)** : `go:games`, `listGames` / `games`, carte d'accueil.
 5. **Postgres (prod)** : `PostgresRoomRepository`, `render.yaml`, README.
 6. **Notifications (US3)** : manifeste et icônes, service worker, `/api/push-key`, `push.ts` serveur et client, écran d'activation et cas iOS.

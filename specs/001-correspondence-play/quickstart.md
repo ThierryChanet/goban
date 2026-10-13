@@ -17,7 +17,7 @@ Les nouvelles suites doivent couvrir :
 
 - `GoGame.toRecord` / `fromRecord`, avec un instantané identique et le même comportement ensuite (ko, annulation, passe → comptage → reprise) ;
 - `FileRoomRepository`, avec une écriture atomique, une relecture et une suppression ;
-- les règles de salle : mode par défaut, clé de place, annulation restreinte, `listGames`, expiration à 30 jours ;
+- les règles de salle : mode par défaut, `claimSeat` multi-appareils, annulation restreinte, `listGames`, expiration à 30 jours ;
 - le regroupement des notifications : une seule par fenêtre de 30 s, pas d'envoi si l'adversaire est connecté, purge sur 410.
 
 ## 2. Partie en différé et redémarrage (US1, SC-001, SC-002)
@@ -47,11 +47,12 @@ Créer 3 parties depuis A, jouer dans deux d'entre elles depuis B, puis revenir 
 l'accueil de A. La liste affiche les 3 parties, avec « À vous de jouer » en tête. Un
 toucher ouvre la partie à sa place.
 
-## 5. Lien personnel (FR-010, SC-005)
+## 5. Nouvel appareil (FR-010, SC-005)
 
-Dans la partie, ouvrir « Mon lien personnel » et l'ouvrir dans un autre navigateur. On
-retrouve sa couleur et l'on peut jouer, et le paramètre `k` disparaît de la barre
-d'adresse. L'adversaire ne voit jamais ce lien.
+Ouvrir le lien d'invitation dans un troisième navigateur, alors que les deux places
+sont prises. L'application demande « Qui êtes-vous ? ». Choisir Noir : on peut jouer
+depuis ce navigateur **et** depuis l'onglet A. Choisir « Juste regarder » : on reste
+spectateur, avec un bouton « Je suis un joueur » pour changer d'avis.
 
 ## 6. Notifications (US3, SC-004)
 
